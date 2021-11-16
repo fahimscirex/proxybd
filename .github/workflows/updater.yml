@@ -1,0 +1,39 @@
+name: Proxy Updater
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Scrape Proxies
+        continue-on-error: true
+        run: |
+          rm -rf BD*
+          chmod +x scraper.sh
+          sh scraper.sh
+
+      - name: Push Updated Proxies
+        continue-on-error: true
+        run: |
+          git config --local user.email ${{ secrets.GIT_EMAIL }}
+          git config --local user.name ${{ secrets.GIT_NAME }}
+          git add .
+          git commit -am "Updated Proxies : $(TZ='Asia/Dhaka' date)"
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+
