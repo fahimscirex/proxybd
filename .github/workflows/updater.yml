@@ -20,16 +20,16 @@ jobs:
       - name: Scrape Proxies
         continue-on-error: true
         run: |
-          rm -rf BD*
-          chmod +x scraper.sh
-          sh scraper.sh
+          rm -rf anonymous-proxylist proxylist
+          chmod +x src/scraper.sh
+          sh src/scraper.sh
 
       - name: Push Updated Proxies
         continue-on-error: true
         run: |
           git config --local user.email ${{ secrets.GIT_EMAIL }}
           git config --local user.name ${{ secrets.GIT_NAME }}
-          git add .
+          git add proxylist anonymous-proxylist
           git commit -am "Updated Proxies : $(TZ='Asia/Dhaka' date)"
 
       - name: Push Changes
